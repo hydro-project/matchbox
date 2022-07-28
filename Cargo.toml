@@ -1,0 +1,15 @@
+[package]
+name = "match_deref"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Deref patterns in \"match\" for stable Rust. Now you can match through Rc, String, etc"
+homepage = "https://sr.ht/~safinaskar/match_deref-rs"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.41"
+quote = "1.0.20"
+syn = { version = "1.0.98", features = ["fold", "full", "extra-traits"] }
