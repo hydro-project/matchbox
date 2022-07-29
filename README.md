@@ -55,3 +55,7 @@ match v {
 ```
 
 My macro is hygienic, i. e. everything will work even if you use variable named `a0`
+
+You don't need to be registered on SourceHut to create bug report.
+
+If you think that this software is not needed or existing software already subsumes its functionality, please, tell me that, I will not be offended.

@@ -1,6 +1,6 @@
 [package]
 name = "match_deref"
-version = "0.1.1-alpha.2"
+version = "0.1.1"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "Deref patterns in \"match\" for stable Rust. Now you can match through Rc, String, etc"

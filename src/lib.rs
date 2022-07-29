@@ -1,3 +1,5 @@
+//! See README (<https://crates.io/crates/match_deref>)
+
 #![allow(clippy::needless_return)]
 
 struct MyFold {
@@ -74,6 +76,7 @@ fn do_match_deref(mut m: syn::ExprMatch) -> syn::ExprMatch {
     return m;
 }
 
+/// See README (<https://crates.io/crates/match_deref>)
 #[proc_macro]
 pub fn match_deref(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let a = do_match_deref(syn::parse_macro_input!(tokens as syn::ExprMatch));
