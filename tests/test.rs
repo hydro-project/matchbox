@@ -55,5 +55,25 @@ fn tests() {
                 }
             }, 0);
         }
+        match_deref::match_deref!{
+            match &Cons(Rc::new(Nil), Rc::new(Nil)) {
+                Cons(a @ Deref @ b @ Nil, _) => {
+                    assert_eq!(a, &Rc::new(Nil));
+                    assert_eq!(b, &Nil);
+                },
+                _ => panic!(),
+            }
+        }
+        assert_eq!(match_deref::match_deref!{
+            match &Cons(Rc::new(Cons(Rc::new(Nil), Rc::new(Nil))), Rc::new(Nil)) {
+                Cons(Deref @ a, _) => match_deref::match_deref! {
+                    match a {
+                        Cons(Deref @ Nil, _) => 5,
+                        _ => panic!(),
+                    }
+                },
+                _ => panic!(),
+            }
+        }, 5);
     }
 }
