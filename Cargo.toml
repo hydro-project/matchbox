@@ -5,6 +5,7 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "Deref patterns in \"match\" for stable Rust. Now you can match through Rc, String, etc"
 homepage = "https://sr.ht/~safinaskar/match_deref-rs"
+repository = "https://git.sr.ht/~safinaskar/match_deref-rs"
 
 [lib]
 proc-macro = true
