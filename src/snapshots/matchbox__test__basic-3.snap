@@ -1,15 +1,15 @@
 ---
 source: src/test.rs
-expression: "snapshot! { match () { Deref @ (Deref @ (Deref @ x,), Deref @ y) => () } }"
+expression: "snapshot!\n{\n    match ()\n    {\n        deref!((deref!((deref!(x),)), deref!(y))) => {} Deref @\n        (Deref @ (Deref @ x,), Deref @ y) => {}\n    }\n}"
 ---
 fn main() {
     match () {
         a0 if {
             #[allow(unused_variables)]
-            if let (a1, a2) = ::core::ops::Deref::deref(a0) {
-                if let (a3,) = ::core::ops::Deref::deref(a1) {
-                    if let y = ::core::ops::Deref::deref(a2) {
-                        if let x = ::core::ops::Deref::deref(a3) { true } else { false }
+            if let (a1, a2) = &**a0 {
+                if let (a3,) = &**a1 {
+                    if let y = &**a2 {
+                        if let x = &**a3 { true } else { false }
                     } else {
                         false
                     }
@@ -20,11 +20,53 @@ fn main() {
                 false
             }
         } => {
-            if let (a1, a2) = ::core::ops::Deref::deref(a0) {
-                if let (a3,) = ::core::ops::Deref::deref(a1) {
-                    if let y = ::core::ops::Deref::deref(a2) {
-                        if let x = ::core::ops::Deref::deref(a3) {
-                            ()
+            if let (a1, a2) = &**a0 {
+                if let (a3,) = &**a1 {
+                    if let y = &**a2 {
+                        if let x = &**a3 {
+                            {}
+                        } else {
+                            panic!(
+                                "Two invocations of Deref::deref returned different outputs on same inputs",
+                            )
+                        }
+                    } else {
+                        panic!(
+                            "Two invocations of Deref::deref returned different outputs on same inputs",
+                        )
+                    }
+                } else {
+                    panic!(
+                        "Two invocations of Deref::deref returned different outputs on same inputs",
+                    )
+                }
+            } else {
+                panic!(
+                    "Two invocations of Deref::deref returned different outputs on same inputs",
+                )
+            }
+        }
+        a0 if {
+            #[allow(unused_variables)]
+            if let (a1, a2) = &**a0 {
+                if let (a3,) = &**a1 {
+                    if let y = &**a2 {
+                        if let x = &**a3 { true } else { false }
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        } => {
+            if let (a1, a2) = &**a0 {
+                if let (a3,) = &**a1 {
+                    if let y = &**a2 {
+                        if let x = &**a3 {
+                            {}
                         } else {
                             panic!(
                                 "Two invocations of Deref::deref returned different outputs on same inputs",

@@ -1,20 +1,20 @@
 ---
 source: src/test.rs
-expression: "snapshot!\n{ match () { Deref @ (Deref @ x,) => (), Deref @ (Deref @ x,) => () } }"
+expression: "snapshot!\n{ match () { deref!((deref!(x),)) => {} Deref @ (Deref @ x,) => {} } }"
 ---
 fn main() {
     match () {
         a0 if {
             #[allow(unused_variables)]
-            if let (a1,) = ::core::ops::Deref::deref(a0) {
-                if let x = ::core::ops::Deref::deref(a1) { true } else { false }
+            if let (a1,) = &**a0 {
+                if let x = &**a1 { true } else { false }
             } else {
                 false
             }
         } => {
-            if let (a1,) = ::core::ops::Deref::deref(a0) {
-                if let x = ::core::ops::Deref::deref(a1) {
-                    ()
+            if let (a1,) = &**a0 {
+                if let x = &**a1 {
+                    {}
                 } else {
                     panic!(
                         "Two invocations of Deref::deref returned different outputs on same inputs",
@@ -28,15 +28,15 @@ fn main() {
         }
         a0 if {
             #[allow(unused_variables)]
-            if let (a1,) = ::core::ops::Deref::deref(a0) {
-                if let x = ::core::ops::Deref::deref(a1) { true } else { false }
+            if let (a1,) = &**a0 {
+                if let x = &**a1 { true } else { false }
             } else {
                 false
             }
         } => {
-            if let (a1,) = ::core::ops::Deref::deref(a0) {
-                if let x = ::core::ops::Deref::deref(a1) {
-                    ()
+            if let (a1,) = &**a0 {
+                if let x = &**a1 {
+                    {}
                 } else {
                     panic!(
                         "Two invocations of Deref::deref returned different outputs on same inputs",
