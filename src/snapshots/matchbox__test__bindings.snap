@@ -1,0 +1,20 @@
+---
+source: src/test.rs
+expression: "snapshot! { match () { a @ Deref @ b @ () => {}, _ => panic!(), } }"
+---
+fn main() {
+    match () {
+        a @ a0 if {
+            #[allow(unused_variables)] if let b @ () = &**a0 { true } else { false }
+        } => {
+            if let b @ () = &**a0 {
+                {}
+            } else {
+                panic!(
+                    "Two invocations of Deref::deref returned different outputs on same inputs",
+                )
+            }
+        }
+        _ => panic!(),
+    }
+}

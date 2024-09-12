@@ -1,16 +1,20 @@
 ---
 source: src/test.rs
-expression: "snapshot! { match () { Deref @ Deref @ x => () } }"
+expression: "snapshot! { match () { owned!((owned!(x),)) => {} } }"
 ---
 fn main() {
     match () {
         a0 if {
             #[allow(unused_variables)]
-            if let a1 = &**a0 { if let x = &**a1 { true } else { false } } else { false }
+            if let (a1,) = &*a0 {
+                if let x = &*a1 { true } else { false }
+            } else {
+                false
+            }
         } => {
-            if let a1 = &**a0 {
-                if let x = &**a1 {
-                    ()
+            if let (a1,) = *a0 {
+                if let x = *a1 {
+                    {}
                 } else {
                     panic!(
                         "Two invocations of Deref::deref returned different outputs on same inputs",

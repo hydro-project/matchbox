@@ -1,6 +1,6 @@
 `Deref` patterns in `match` for stable Rust. Now you can match through `Rc`, `String`, etc.
 
-`matchbox::match_deref!{...}` is a procedural macro, which allows you to use deref patterns right now in stable Rust.
+`matchbox::matchbox!{...}` is a procedural macro, which allows you to use deref patterns right now in stable Rust.
 
 For example:
 ```rust,no_run
@@ -15,7 +15,7 @@ enum Value {
 use Value::*;
 
 let v: &Value = todo!();
-matchbox::match_deref!{
+matchbox::matchbox!{
     match v {
         Nil => todo!(),
         Cons(Deref @ Symbol(Deref @ "quote"), Deref @ Cons(x, Deref @ Nil)) => todo!(),
@@ -34,7 +34,7 @@ The macro calls `Deref::deref` internally. Keep in mind that `Deref::deref` take
 
 Consider this code:
 ```rust,ignore
-matchbox::match_deref!{
+matchbox::matchbox!{
     match v {
         Symbol(Deref @ x) => {
             // some_code_here

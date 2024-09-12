@@ -3,7 +3,7 @@
 macro_rules! snapshot {
     ( $( $x:tt )* ) => {
         {
-            let match_expr = crate::do_match_deref(::syn::parse_quote! {
+            let match_expr = crate::matchbox_impl(::syn::parse_quote! {
                 $( $x )*
             });
             ::prettyplease::unparse(&::syn::parse_quote! {
@@ -35,15 +35,38 @@ fn test_basic() {
     // Every arm starts with 0
     snapshot_test! {
         match () {
-            Deref @ (Deref @ x,) => (),
-            Deref @ (Deref @ x,) => ()
+            deref!((deref!(x),)) => {}
+            Deref @ (Deref @ x,) => {}
         }
     };
 
     // More difficult test
     snapshot_test! {
         match () {
-            Deref @ (Deref @ (Deref @ x,), Deref @ y) => ()
+            deref!((deref!((deref!(x),)), deref!(y))) => {}
+            Deref @ (Deref @ (Deref @ x,), Deref @ y) => {}
+        }
+    };
+}
+
+#[test]
+fn test_basic_owned() {
+    snapshot_test! {
+        match () {
+        }
+    }
+
+    // Every arm starts with 0
+    snapshot_test! {
+        match () {
+            owned!((owned!(x),)) => {}
+        }
+    };
+
+    // More difficult test
+    snapshot_test! {
+        match () {
+            owned!((owned!((owned!(x),)), owned!(y))) => {}
         }
     };
 }
@@ -65,7 +88,7 @@ fn test_spelling() {
 
 #[test]
 fn test_other() {
-    // match_deref! doesn't insert unneded guard "if true"
+    // matchbox! doesn't insert unneded guard "if true"
     snapshot_test! {
         match () {
             Deref @ x => ()
@@ -88,6 +111,16 @@ fn test_other() {
             _ => panic!()
         }
     };
+}
+
+#[test]
+fn test_bindings() {
+    snapshot_test! {
+        match () {
+            a @ Deref @ b @ () => {},
+            _ => panic!(),
+        }
+    }
 }
 
 #[test]

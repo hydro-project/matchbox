@@ -1,0 +1,50 @@
+---
+source: src/test.rs
+expression: "snapshot! { match () { owned!((owned!((owned!(x),)), owned!(y))) => {} } }"
+---
+fn main() {
+    match () {
+        a0 if {
+            #[allow(unused_variables)]
+            if let (a1, a2) = &*a0 {
+                if let (a3,) = &*a1 {
+                    if let y = &*a2 {
+                        if let x = &*a3 { true } else { false }
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        } => {
+            if let (a1, a2) = *a0 {
+                if let (a3,) = *a1 {
+                    if let y = *a2 {
+                        if let x = *a3 {
+                            {}
+                        } else {
+                            panic!(
+                                "Two invocations of Deref::deref returned different outputs on same inputs",
+                            )
+                        }
+                    } else {
+                        panic!(
+                            "Two invocations of Deref::deref returned different outputs on same inputs",
+                        )
+                    }
+                } else {
+                    panic!(
+                        "Two invocations of Deref::deref returned different outputs on same inputs",
+                    )
+                }
+            } else {
+                panic!(
+                    "Two invocations of Deref::deref returned different outputs on same inputs",
+                )
+            }
+        }
+    }
+}
