@@ -1,0 +1,16 @@
+{
+    "rust-analyzer.runnableEnv": [
+        {
+            "env": {
+                // Stack backtraces.
+                "RUST_BACKTRACE": "1",
+                // Make sure all snapshots are written instead of just the first failure.
+                "INSTA_FORCE_PASS": "1",
+                "INSTA_UPDATE": "always",
+            }
+        }
+    ],
+    "files.watcherExclude": {
+        "**/target": true
+    }
+}

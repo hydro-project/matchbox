@@ -1,0 +1,9 @@
+---
+source: src/test.rs
+expression: "snapshot! { match () { Dereff @ x => () } }"
+---
+fn main() {
+    match () {
+        Dereff @ x => {}
+    }
+}

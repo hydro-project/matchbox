@@ -1,0 +1,21 @@
+---
+source: src/test.rs
+expression: "snapshot! { match &Rc::new(Nil) { Deref @ _ => a0, _ => panic!() } }"
+---
+fn main() {
+    match &Rc::new(Nil) {
+        a0 if {
+            #[allow(unused_variables)]
+            if let _ = ::core::ops::Deref::deref(a0) { true } else { false }
+        } => {
+            if let _ = ::core::ops::Deref::deref(a0) {
+                a0
+            } else {
+                panic!(
+                    "Two invocations of Deref::deref returned different outputs on same inputs",
+                )
+            }
+        }
+        _ => panic!(),
+    }
+}

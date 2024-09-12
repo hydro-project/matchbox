@@ -1,0 +1,20 @@
+---
+source: src/test.rs
+expression: "snapshot! { match () { Deref @ x => () } }"
+---
+fn main() {
+    match () {
+        a0 if {
+            #[allow(unused_variables)]
+            if let x = ::core::ops::Deref::deref(a0) { true } else { false }
+        } => {
+            if let x = ::core::ops::Deref::deref(a0) {
+                ()
+            } else {
+                panic!(
+                    "Two invocations of Deref::deref returned different outputs on same inputs",
+                )
+            }
+        }
+    }
+}

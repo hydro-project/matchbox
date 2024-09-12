@@ -1,0 +1,52 @@
+---
+source: src/test.rs
+expression: "snapshot!\n{ match () { Deref @ (Deref @ x,) => (), Deref @ (Deref @ x,) => () } }"
+---
+fn main() {
+    match () {
+        a0 if {
+            #[allow(unused_variables)]
+            if let (a1,) = ::core::ops::Deref::deref(a0) {
+                if let x = ::core::ops::Deref::deref(a1) { true } else { false }
+            } else {
+                false
+            }
+        } => {
+            if let (a1,) = ::core::ops::Deref::deref(a0) {
+                if let x = ::core::ops::Deref::deref(a1) {
+                    ()
+                } else {
+                    panic!(
+                        "Two invocations of Deref::deref returned different outputs on same inputs",
+                    )
+                }
+            } else {
+                panic!(
+                    "Two invocations of Deref::deref returned different outputs on same inputs",
+                )
+            }
+        }
+        a0 if {
+            #[allow(unused_variables)]
+            if let (a1,) = ::core::ops::Deref::deref(a0) {
+                if let x = ::core::ops::Deref::deref(a1) { true } else { false }
+            } else {
+                false
+            }
+        } => {
+            if let (a1,) = ::core::ops::Deref::deref(a0) {
+                if let x = ::core::ops::Deref::deref(a1) {
+                    ()
+                } else {
+                    panic!(
+                        "Two invocations of Deref::deref returned different outputs on same inputs",
+                    )
+                }
+            } else {
+                panic!(
+                    "Two invocations of Deref::deref returned different outputs on same inputs",
+                )
+            }
+        }
+    }
+}

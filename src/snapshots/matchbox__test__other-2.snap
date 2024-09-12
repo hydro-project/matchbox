@@ -1,0 +1,9 @@
+---
+source: src/test.rs
+expression: "snapshot! { match () { x => () } }"
+---
+fn main() {
+    match () {
+        x => {}
+    }
+}
