@@ -1,11 +1,10 @@
 [package]
-name = "match_deref"
-version = "0.1.1"
+name = "matchbox"
+version = "0.0.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "Deref patterns in \"match\" for stable Rust. Now you can match through Rc, String, etc"
-homepage = "https://sr.ht/~safinaskar/match_deref-rs"
-repository = "https://git.sr.ht/~safinaskar/match_deref-rs"
+description = "`box` and deref patterns in \"match\" for stable Rust. Now you can match through `Box`, `Rc`, etc."
+repository = "https://github.com/hydro-project/matchbox"
 
 [lib]
 proc-macro = true

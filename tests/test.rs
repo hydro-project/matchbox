@@ -10,7 +10,7 @@ fn tests() {
             Symbol(String),
         }
         use LispValue::*;
-        let _: i32 = match_deref::match_deref! {
+        let _: i32 = matchbox::match_deref! {
             match &Nil {
                 Nil => 0,
                 Cons(Deref @ _, Deref @ Nil) => 0,
@@ -20,7 +20,7 @@ fn tests() {
             }
         };
         assert_eq!(
-            match_deref::match_deref! {
+            matchbox::match_deref! {
                 match &Cons(Rc::new(Symbol("a".to_owned())), Rc::new(Nil)) {
                     Cons(Deref @ Symbol(Deref @ "a"), _) => 1,
                     _ => 0
@@ -29,7 +29,7 @@ fn tests() {
             1
         );
         assert_eq!(
-            match_deref::match_deref! {
+            matchbox::match_deref! {
                 match &Cons(Rc::new(Symbol("a".to_owned())), Rc::new(Nil)) {
                     Cons(Deref @ Symbol(Deref @ "b"), _) => 1,
                     _ => 0
@@ -38,7 +38,7 @@ fn tests() {
             0
         );
         assert_eq!(
-            match_deref::match_deref! {
+            matchbox::match_deref! {
                 match &Cons(Rc::new(Symbol("a".to_owned())), Rc::new(Nil)) {
                     Cons(Deref @ Symbol(Deref @ "a"), Deref @ x) => x,
                     _ => panic!()
@@ -48,7 +48,7 @@ fn tests() {
         );
         assert_eq!(
             (|| {
-                let _: i32 = match_deref::match_deref! {
+                let _: i32 = matchbox::match_deref! {
                     match &Cons(Rc::new(Symbol("a".to_owned())), Rc::new(Nil)) {
                         Cons(Deref @ Symbol(Deref @ "a"), Deref @ x) => return x.clone(),
                         _ => 0
@@ -61,7 +61,7 @@ fn tests() {
         {
             let a0 = 0;
             assert_eq!(
-                match_deref::match_deref! {
+                matchbox::match_deref! {
                     match &Rc::new(Nil) {
                         Deref @ _ => a0,
                         _ => panic!()
@@ -70,7 +70,7 @@ fn tests() {
                 0
             );
         }
-        match_deref::match_deref! {
+        matchbox::match_deref! {
             match &Cons(Rc::new(Nil), Rc::new(Nil)) {
                 Cons(a @ Deref @ b @ Nil, _) => {
                     assert_eq!(a, &Rc::new(Nil));
@@ -80,9 +80,9 @@ fn tests() {
             }
         }
         assert_eq!(
-            match_deref::match_deref! {
+            matchbox::match_deref! {
                 match &Cons(Rc::new(Cons(Rc::new(Nil), Rc::new(Nil))), Rc::new(Nil)) {
-                    Cons(Deref @ a, _) => match_deref::match_deref! {
+                    Cons(Deref @ a, _) => matchbox::match_deref! {
                         match a {
                             Cons(Deref @ Nil, _) => 5,
                             _ => panic!(),
