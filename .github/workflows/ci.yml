@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5.3.0
+        with:
+          cancel_others: "true"
+
+  check:
+    name: Lint and Check
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' || github.event_name != 'pull_request' }}
+    timeout-minutes: 10
+    needs: pre_job
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    env:
+      CARGO_TERM_COLOR: always
+      CARGO_INCREMENTAL: 0
+      CARGO_PROFILE_DEV_STRIP: "debuginfo"
+      CARGO_PROFILE_TEST_STRIP: "debuginfo"
+      CARGO_PROFILE_RELEASE_STRIP: "debuginfo"
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          components: rustfmt, clippy
+
+      - name: Run cargo fmt
+        run: cargo +nightly fmt --all -- --check
+
+      - name: Run cargo clippy
+        run: cargo +nightly clippy --all-targets --features python -- -D warnings
+
+      - name: Run cargo check
+        run: cargo +nightly check --all-targets --features python
+
+      - name: Run cargo check (no default features)
+        run: cargo +nightly check --all-targets --no-default-features
+
+  test:
+    name: Test Suite
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' || github.event_name != 'pull_request' }}
+    timeout-minutes: 10
+    needs: pre_job
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    env:
+      CARGO_TERM_COLOR: always
+      CARGO_INCREMENTAL: 0
+      CARGO_PROFILE_DEV_STRIP: "debuginfo"
+      CARGO_PROFILE_TEST_STRIP: "debuginfo"
+      CARGO_PROFILE_RELEASE_STRIP: "debuginfo"
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: ${{ matrix.rust_release == 'latest-nightly' }}
+
+      - name: Install cargo-nextest (linux)
+        run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+
+      - name: Run cargo nextest on all targets
+        run: cargo nextest run --no-fail-fast --all-targets
+
+      - name: Run doctests
+        run: cargo test --no-fail-fast --doc
