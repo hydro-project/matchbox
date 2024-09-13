@@ -129,28 +129,30 @@ impl syn::fold::Fold for MyFold {
 }
 
 fn tower(binds: &[Bind], yes: syn::Expr, no: &syn::Expr, add_ref: bool) -> syn::Expr {
-    if binds.is_empty() {
-        yes
-    } else {
-        let Bind {
+    let mut out = yes;
+    for bind in binds.iter().rev()
+    {
+        let &Bind {
             ref id,
             ref pat,
             mut typ,
             span,
-        } = binds[0];
-        let rec = tower(&binds[1..], yes, no, add_ref);
+        } = bind;
+
         if add_ref {
             typ = typ.add_ref();
         }
-        let op = typ.as_op(span);
-        syn::parse_quote_spanned! {span=>
+        let op: proc_macro2::TokenStream = typ.as_op(span);
+
+        out = syn::parse_quote_spanned! {span=>
             if let #pat = #op #id {
-                #rec
+                #out
             } else {
                 #no
             }
-        }
+        };
     }
+    out
 }
 
 fn matchbox_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
