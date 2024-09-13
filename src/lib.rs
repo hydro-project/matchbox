@@ -62,7 +62,6 @@ struct Bind {
 struct MyFold {
     binds: Vec<Bind>,
     counter: u32,
-    diagnostics: Vec<proc_macro_error2::Diagnostic>,
 }
 impl MyFold {
     fn handle(&mut self, subpat: syn::Pat, typ: Type, span: proc_macro2::Span) -> syn::PatIdent {
@@ -106,8 +105,8 @@ impl syn::fold::Fold for MyFold {
                         syn::Pat::Ident(pat_ident)
                     }
                     Err(err) => {
-                        self.diagnostics.push(err.into());
-                        syn::parse_quote_spanned!(span=> _error) // Error placeholder pattern.
+                        let compile_error = err.into_compile_error();
+                        syn::parse_quote_spanned!(span=> #compile_error)
                     }
                 }
             } else {
