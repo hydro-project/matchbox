@@ -155,15 +155,15 @@ fn matchbox_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
         arm.pat = my_fold.fold_pat(arm.pat);
 
         if !my_fold.binds.is_empty() {
-            let (yes, no) = if let Some((_if_token, src_guard)) = arm.guard {
-                (*src_guard, syn::parse_quote_spanned! {span=> false })
-            } else {
-                (
-                    syn::parse_quote_spanned! {span=> true },
-                    syn::parse_quote_spanned! {span=> false },
-                )
+            let t = {
+                let yes = if let Some((_if_token, src_guard)) = arm.guard {
+                    *src_guard
+                } else {
+                    syn::parse_quote_spanned! {span=> true }
+                };
+                let no = syn::parse_quote_spanned! {span=> false };
+                tower(&my_fold.binds, yes, &no, true)
             };
-            let t = tower(&my_fold.binds, yes, &no, true);
             arm.guard = Some((
                 syn::Token![if](span),
                 Box::new(syn::parse_quote_spanned! {span=> { #[allow(unused_variables)] #t } }),
