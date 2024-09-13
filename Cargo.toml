@@ -10,7 +10,6 @@ repository = "https://github.com/hydro-project/matchbox"
 proc-macro = true
 
 [dependencies]
-proc-macro-error2 = "2.0.0"
 proc-macro2 = "1.0.80"
 quote = "1.0.37"
 syn = { version = "2.0.7", features = ["fold", "full", "extra-traits"] }
