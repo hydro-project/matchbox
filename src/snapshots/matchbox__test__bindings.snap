@@ -1,6 +1,6 @@
 ---
 source: src/test.rs
-expression: "snapshot! { match () { a @ Deref @ b @ () => {}, _ => panic!(), } }"
+expression: "snapshot! { match () { a @ deref!(b @ ()) => {}, _ => panic!(), } }"
 ---
 fn main() {
     match () {

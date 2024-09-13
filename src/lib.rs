@@ -117,17 +117,6 @@ impl syn::fold::Fold for MyFold {
             syn::fold::fold_pat(self, i)
         }
     }
-
-    fn fold_pat_ident(&mut self, i: syn::PatIdent) -> syn::PatIdent {
-        if i.by_ref.is_some() || i.mutability.is_some() || i.ident != "Deref" {
-            syn::fold::fold_pat_ident(self, i)
-        } else if let Some((_at, subpat)) = i.subpat {
-            let subpat = syn::fold::fold_pat(self, *subpat);
-            self.handle(subpat, Type::Deref, i.ident.span())
-        } else {
-            syn::fold::fold_pat_ident(self, i)
-        }
-    }
 }
 
 fn tower(binds: &[Bind], yes: syn::Expr, no: &syn::Expr, add_ref: bool) -> syn::Expr {
