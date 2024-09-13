@@ -36,7 +36,6 @@ fn test_basic() {
     snapshot_test! {
         match () {
             deref!((deref!(x),)) => {}
-            Deref @ (Deref @ x,) => {}
         }
     };
 
@@ -44,7 +43,6 @@ fn test_basic() {
     snapshot_test! {
         match () {
             deref!((deref!((deref!(x),)), deref!(y))) => {}
-            Deref @ (Deref @ (Deref @ x,), Deref @ y) => {}
         }
     };
 }
@@ -73,15 +71,15 @@ fn test_basic_owned() {
 
 #[test]
 fn test_spelling() {
-    // "Deref" works, "Dereff" doesn't
+    // "deref!" works, "dereff!" doesn't
     snapshot_test! {
         match () {
-            Deref @ x => ()
+            deref!(x) => ()
         }
     };
     snapshot_test! {
         match () {
-            Dereff @ x => ()
+            dereff!(x) => ()
         }
     };
 }
@@ -91,7 +89,7 @@ fn test_other() {
     // matchbox! doesn't insert unneded guard "if true"
     snapshot_test! {
         match () {
-            Deref @ x => ()
+            deref!(x) => ()
         }
     };
     snapshot_test! {
@@ -102,12 +100,12 @@ fn test_other() {
 
     snapshot_test! {
         match () {
-            Deref @ Deref @ x => ()
+            deref!(deref!(x)) => ()
         }
     };
     snapshot_test! {
         match &Rc::new(Nil) {
-            Deref @ _ => a0,
+            deref!(_) => a0,
             _ => panic!()
         }
     };
@@ -117,7 +115,7 @@ fn test_other() {
 fn test_bindings() {
     snapshot_test! {
         match () {
-            a @ Deref @ b @ () => {},
+            a @ deref!(b @ ()) => {},
             _ => panic!(),
         }
     }
@@ -128,7 +126,7 @@ fn test_guards() {
     // Guards
     snapshot_test! {
         match () {
-            Deref @ x if x == x => ()
+            deref!(x) if x == x => ()
         }
     };
     snapshot_test! {

@@ -13,8 +13,8 @@ fn tests() {
     let _: i32 = matchbox::matchbox! {
         match &Nil {
             Nil => 0,
-            Cons(Deref @ _, Deref @ Nil) => 0,
-            Cons(Deref @ Symbol(Deref @ "a"), _) => 0,
+            Cons(deref!(_), deref!(Nil)) => 0,
+            Cons(deref!(Symbol(deref!("a"))), _) => 0,
             Cons(_, _) => 0,
             Symbol(_) => 0,
         }
@@ -22,7 +22,7 @@ fn tests() {
     assert_eq!(
         matchbox::matchbox! {
             match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
-                Cons(Deref @ Symbol(Deref @ "a"), _) => 1,
+                Cons(deref!(Symbol(deref!("a"))), _) => 1,
                 _ => 0
             }
         },
@@ -31,7 +31,7 @@ fn tests() {
     assert_eq!(
         matchbox::matchbox! {
             match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
-                Cons(Deref @ Symbol(Deref @ "b"), _) => 1,
+                Cons(deref!(Symbol(deref!("b"))), _) => 1,
                 _ => 0
             }
         },
@@ -40,7 +40,7 @@ fn tests() {
     assert_eq!(
         matchbox::matchbox! {
             match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
-                Cons(Deref @ Symbol(Deref @ "a"), Deref @ x) => x,
+                Cons(deref!(Symbol(deref!("a"))), deref!(x)) => x,
                 _ => panic!()
             }
         },
@@ -50,7 +50,7 @@ fn tests() {
         (|| {
             let _: i32 = matchbox::matchbox! {
                 match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
-                    Cons(Deref @ Symbol(Deref @ "a"), Deref @ x) => return x.clone(),
+                    Cons(deref!(Symbol(deref!("a"))), deref!(x)) => return x.clone(),
                     _ => 0
                 }
             };
@@ -63,7 +63,7 @@ fn tests() {
         assert_eq!(
             matchbox::matchbox! {
                 match &Box::new(Nil) {
-                    Deref @ _ => a0,
+                    deref!(_) => a0,
                     _ => panic!()
                 }
             },
@@ -82,9 +82,9 @@ fn tests() {
     assert_eq!(
         matchbox::matchbox! {
             match &Cons(Box::new(Cons(Box::new(Nil), Box::new(Nil))), Box::new(Nil)) {
-                Cons(Deref @ a, _) => matchbox::matchbox! {
+                Cons(deref!(a), _) => matchbox::matchbox! {
                     match a {
-                        Cons(Deref @ Nil, _) => 5,
+                        Cons(deref!(Nil), _) => 5,
                         _ => panic!(),
                     }
                 },
@@ -159,7 +159,7 @@ fn tests_owned() {
     }
     // matchbox::matchbox! {
     //     match &Cons(Box::new(Nil), Box::new(Nil)) {
-    //         Cons(a @ Deref @ b @ Nil, _) => {
+    //         Cons(a @ deref!(b @ Nil), _) => {
     //             assert_eq!(a, &Box::new(Nil));
     //             assert_eq!(b, &Nil);
     //         },

@@ -1,6 +1,6 @@
 ---
 source: src/test.rs
-expression: "snapshot! { match () { Deref @ x if x == x => () } }"
+expression: "snapshot! { match () { deref!(x) if x == x => () } }"
 ---
 fn main() {
     match () {

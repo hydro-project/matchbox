@@ -1,51 +1,9 @@
 ---
 source: src/test.rs
-expression: "snapshot!\n{\n    match ()\n    {\n        deref!((deref!((deref!(x),)), deref!(y))) => {} Deref @\n        (Deref @ (Deref @ x,), Deref @ y) => {}\n    }\n}"
+expression: "snapshot! { match () { deref!((deref!((deref!(x),)), deref!(y))) => {} } }"
 ---
 fn main() {
     match () {
-        a3 if {
-            #[allow(unused_variables)]
-            if let (a1, a2) = &**a3 {
-                if let y = &**a2 {
-                    if let (a0,) = &**a1 {
-                        if let x = &**a0 { true } else { false }
-                    } else {
-                        false
-                    }
-                } else {
-                    false
-                }
-            } else {
-                false
-            }
-        } => {
-            if let (a1, a2) = &**a3 {
-                if let y = &**a2 {
-                    if let (a0,) = &**a1 {
-                        if let x = &**a0 {
-                            {}
-                        } else {
-                            panic!(
-                                "Two invocations of Deref::deref returned different outputs on same inputs",
-                            )
-                        }
-                    } else {
-                        panic!(
-                            "Two invocations of Deref::deref returned different outputs on same inputs",
-                        )
-                    }
-                } else {
-                    panic!(
-                        "Two invocations of Deref::deref returned different outputs on same inputs",
-                    )
-                }
-            } else {
-                panic!(
-                    "Two invocations of Deref::deref returned different outputs on same inputs",
-                )
-            }
-        }
         a3 if {
             #[allow(unused_variables)]
             if let (a1, a2) = &**a3 {
