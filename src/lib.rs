@@ -51,9 +51,16 @@ impl FromStr for Type {
     }
 }
 
+struct Bind {
+    id: syn::Ident,
+    pat: syn::Pat,
+    typ: Type,
+    span: proc_macro2::Span,
+}
+
 #[derive(Default)]
 struct MyFold {
-    binds: Vec<(syn::Ident, syn::Pat, Type, proc_macro2::Span)>,
+    binds: Vec<Bind>,
     counter: i32,
     diagnostics: Vec<proc_macro_error2::Diagnostic>,
 }
@@ -64,7 +71,12 @@ impl MyFold {
             subpat.span().resolved_at(proc_macro2::Span::mixed_site()),
         );
         self.counter += 1;
-        self.binds.push((id.clone(), subpat, typ, span));
+        self.binds.push(Bind {
+            id: id.clone(),
+            pat: subpat,
+            typ,
+            span,
+        });
         syn::PatIdent {
             attrs: vec![],
             by_ref: None,
@@ -116,16 +128,16 @@ impl syn::fold::Fold for MyFold {
     }
 }
 
-fn tower(
-    binds: &[(syn::Ident, syn::Pat, Type, proc_macro2::Span)],
-    yes: syn::Expr,
-    no: &syn::Expr,
-    add_ref: bool,
-) -> syn::Expr {
+fn tower(binds: &[Bind], yes: syn::Expr, no: &syn::Expr, add_ref: bool) -> syn::Expr {
     if binds.is_empty() {
         yes
     } else {
-        let (ref id, ref pat, mut typ, span) = binds[0];
+        let Bind {
+            ref id,
+            ref pat,
+            mut typ,
+            span,
+        } = binds[0];
         let rec = tower(&binds[1..], yes, no, add_ref);
         if add_ref {
             typ = typ.add_ref();
@@ -154,10 +166,10 @@ fn matchbox_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
             let mut i = 0;
             while i < my_fold.binds.len() {
                 let a = std::mem::replace(
-                    &mut my_fold.binds[i].1,
+                    &mut my_fold.binds[i].pat,
                     syn::Pat::Verbatim(quote::quote_spanned!(span=> )), // Temp placeholder
                 );
-                my_fold.binds[i].1 = my_fold.fold_pat(a);
+                my_fold.binds[i].pat = my_fold.fold_pat(a);
                 i += 1;
             }
         }
