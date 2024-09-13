@@ -4,12 +4,12 @@ expression: "snapshot!\n{\n    match ()\n    {\n        deref!((deref!((deref!(x
 ---
 fn main() {
     match () {
-        a0 if {
+        a3 if {
             #[allow(unused_variables)]
-            if let (a1, a2) = &**a0 {
-                if let (a3,) = &**a1 {
-                    if let y = &**a2 {
-                        if let x = &**a3 { true } else { false }
+            if let (a1, a2) = &**a3 {
+                if let y = &**a2 {
+                    if let (a0,) = &**a1 {
+                        if let x = &**a0 { true } else { false }
                     } else {
                         false
                     }
@@ -20,10 +20,10 @@ fn main() {
                 false
             }
         } => {
-            if let (a1, a2) = &**a0 {
-                if let (a3,) = &**a1 {
-                    if let y = &**a2 {
-                        if let x = &**a3 {
+            if let (a1, a2) = &**a3 {
+                if let y = &**a2 {
+                    if let (a0,) = &**a1 {
+                        if let x = &**a0 {
                             {}
                         } else {
                             panic!(
@@ -46,12 +46,12 @@ fn main() {
                 )
             }
         }
-        a0 if {
+        a3 if {
             #[allow(unused_variables)]
-            if let (a1, a2) = &**a0 {
-                if let (a3,) = &**a1 {
-                    if let y = &**a2 {
-                        if let x = &**a3 { true } else { false }
+            if let (a1, a2) = &**a3 {
+                if let y = &**a2 {
+                    if let (a0,) = &**a1 {
+                        if let x = &**a0 { true } else { false }
                     } else {
                         false
                     }
@@ -62,10 +62,10 @@ fn main() {
                 false
             }
         } => {
-            if let (a1, a2) = &**a0 {
-                if let (a3,) = &**a1 {
-                    if let y = &**a2 {
-                        if let x = &**a3 {
+            if let (a1, a2) = &**a3 {
+                if let y = &**a2 {
+                    if let (a0,) = &**a1 {
+                        if let x = &**a0 {
                             {}
                         } else {
                             panic!(

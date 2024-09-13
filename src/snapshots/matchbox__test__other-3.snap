@@ -4,12 +4,12 @@ expression: "snapshot! { match () { Deref @ Deref @ x => () } }"
 ---
 fn main() {
     match () {
-        a0 if {
+        a1 if {
             #[allow(unused_variables)]
-            if let a1 = &**a0 { if let x = &**a1 { true } else { false } } else { false }
+            if let a0 = &**a1 { if let x = &**a0 { true } else { false } } else { false }
         } => {
-            if let a1 = &**a0 {
-                if let x = &**a1 {
+            if let a0 = &**a1 {
+                if let x = &**a0 {
                     ()
                 } else {
                     panic!(

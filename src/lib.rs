@@ -61,7 +61,7 @@ struct Bind {
 #[derive(Default)]
 struct MyFold {
     binds: Vec<Bind>,
-    counter: i32,
+    counter: u32,
     diagnostics: Vec<proc_macro_error2::Diagnostic>,
 }
 impl MyFold {
@@ -100,6 +100,7 @@ impl syn::fold::Fold for MyFold {
             {
                 match syn::parse2::<PatSingle>(expr_macro.mac.tokens) {
                     Ok(PatSingle(subpat)) => {
+                        let subpat = syn::fold::fold_pat(self, subpat);
                         let typ = typ.parse().unwrap();
                         let pat_ident = self.handle(subpat, typ, span);
                         syn::Pat::Ident(pat_ident)
@@ -121,7 +122,8 @@ impl syn::fold::Fold for MyFold {
         if i.by_ref.is_some() || i.mutability.is_some() || i.ident != "Deref" {
             syn::fold::fold_pat_ident(self, i)
         } else if let Some((_at, subpat)) = i.subpat {
-            self.handle(*subpat, Type::Deref, i.ident.span())
+            let subpat = syn::fold::fold_pat(self, *subpat);
+            self.handle(subpat, Type::Deref, i.ident.span())
         } else {
             syn::fold::fold_pat_ident(self, i)
         }
@@ -130,8 +132,7 @@ impl syn::fold::Fold for MyFold {
 
 fn tower(binds: &[Bind], yes: syn::Expr, no: &syn::Expr, add_ref: bool) -> syn::Expr {
     let mut out = yes;
-    for bind in binds.iter().rev()
-    {
+    for bind in binds {
         let &Bind {
             ref id,
             ref pat,
@@ -163,18 +164,7 @@ fn matchbox_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
         let span = arm.pat.span();
         let mut my_fold = MyFold::default();
         arm.pat = my_fold.fold_pat(arm.pat);
-        {
-            // recurse only after top layer is complete.
-            let mut i = 0;
-            while i < my_fold.binds.len() {
-                let a = std::mem::replace(
-                    &mut my_fold.binds[i].pat,
-                    syn::Pat::Verbatim(quote::quote_spanned!(span=> )), // Temp placeholder
-                );
-                my_fold.binds[i].pat = my_fold.fold_pat(a);
-                i += 1;
-            }
-        }
+
         if !my_fold.binds.is_empty() {
             let (yes, no) = if let Some((_if_token, src_guard)) = arm.guard {
                 (*src_guard, syn::parse_quote_spanned! {span=> false })
