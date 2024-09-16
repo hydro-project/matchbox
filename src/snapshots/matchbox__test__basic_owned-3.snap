@@ -4,47 +4,6 @@ expression: "snapshot! { match () { owned!((owned!((owned!(x),)), owned!(y))) =>
 ---
 fn main() {
     match () {
-        a3 if {
-            #[allow(unused_variables)]
-            if let (a1, a2) = &*a3 {
-                if let y = &*a2 {
-                    if let (a0,) = &*a1 {
-                        if let x = &*a0 { true } else { false }
-                    } else {
-                        false
-                    }
-                } else {
-                    false
-                }
-            } else {
-                false
-            }
-        } => {
-            if let (a1, a2) = *a3 {
-                if let y = *a2 {
-                    if let (a0,) = *a1 {
-                        if let x = *a0 {
-                            {}
-                        } else {
-                            panic!(
-                                "Two invocations of Deref::deref returned different outputs on same inputs",
-                            )
-                        }
-                    } else {
-                        panic!(
-                            "Two invocations of Deref::deref returned different outputs on same inputs",
-                        )
-                    }
-                } else {
-                    panic!(
-                        "Two invocations of Deref::deref returned different outputs on same inputs",
-                    )
-                }
-            } else {
-                panic!(
-                    "Two invocations of Deref::deref returned different outputs on same inputs",
-                )
-            }
-        }
+        owned!((owned!((owned!(x),)), owned!(y))) => {}
     }
 }

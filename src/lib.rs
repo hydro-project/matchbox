@@ -1,60 +1,64 @@
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
-use std::str::FromStr;
-
 use syn::spanned::Spanned;
 
 mod test;
 
-struct PatSingle(syn::Pat);
-impl syn::parse::Parse for PatSingle {
+struct DerefPattern {
+    amp: Option<syn::Token![&]>,
+    mutability: Option<syn::Token![mut]>,
+    deref1: syn::Token![*],
+    deref2: Option<syn::Token![*]>,
+    pat: syn::Pat,
+}
+impl syn::parse::Parse for DerefPattern {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let amp: Option<syn::Token![&]> = input.parse()?;
+        let mutability = if amp.is_some() { input.parse()? } else { None };
+        let deref1 = input.parse()?;
+        let deref2 = if amp.is_some() { input.parse()? } else { None };
         let pat = syn::Pat::parse_single(input)?;
-        Ok(Self(pat))
+        Ok(Self {
+            amp,
+            mutability,
+            deref1,
+            deref2,
+            pat,
+        })
     }
 }
+impl DerefPattern {
+    fn as_guard_op(&self, span: proc_macro2::Span) -> proc_macro2::TokenStream {
+        let Self {
+            amp,
+            deref1,
+            deref2,
+            ..
+        } = self;
+        match (amp, deref2) {
+            (None, None) => quote::quote_spanned!(span=> & #deref1),
+            (Some(amp), None) => quote::quote_spanned!(span=> #amp #deref1 *),
+            (Some(amp), Some(deref2)) => quote::quote_spanned!(span=> #amp #deref2 #deref1),
+            (None, Some(_)) => panic!("Invalid DerefPattern state."),
+        }
+    }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(u8)]
-enum Type {
-    Owned,
-    Stamp,
-    Deref,
-}
-impl Type {
-    fn add_ref(self) -> Self {
-        match self {
-            Self::Owned => Self::Stamp,
-            Self::Stamp => Self::Deref,
-            Self::Deref => Self::Deref,
-        }
-    }
-    fn as_op(self, span: proc_macro2::Span) -> proc_macro2::TokenStream {
-        match self {
-            Self::Owned => quote::quote_spanned! {span=> * },
-            Self::Stamp => quote::quote_spanned! {span=> &* },
-            Self::Deref => quote::quote_spanned! {span=> &** },
-        }
-    }
-}
-impl FromStr for Type {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "owned" => Ok(Self::Owned),
-            "stamp" => Ok(Self::Stamp),
-            "deref" => Ok(Self::Deref),
-            other => Err(other.to_owned()),
-        }
+    fn as_body_op(&self) -> proc_macro2::TokenStream {
+        let Self {
+            amp,
+            mutability,
+            deref1,
+            deref2,
+            ..
+        } = self;
+        quote::quote!(#amp #mutability #deref1 #deref2)
     }
 }
 
 struct Bind {
     id: syn::Ident,
-    pat: syn::Pat,
-    typ: Type,
+    deref_pat: DerefPattern,
     span: proc_macro2::Span,
 }
 
@@ -64,16 +68,18 @@ struct MyFold {
     counter: u32,
 }
 impl MyFold {
-    fn handle(&mut self, subpat: syn::Pat, typ: Type, span: proc_macro2::Span) -> syn::PatIdent {
+    fn handle(&mut self, deref_pat: DerefPattern, span: proc_macro2::Span) -> syn::PatIdent {
         let id = syn::Ident::new(
             &format!("a{}", self.counter),
-            subpat.span().resolved_at(proc_macro2::Span::mixed_site()),
+            deref_pat
+                .pat
+                .span()
+                .resolved_at(proc_macro2::Span::mixed_site()),
         );
         self.counter += 1;
         self.binds.push(Bind {
             id: id.clone(),
-            pat: subpat,
-            typ,
+            deref_pat,
             span,
         });
         syn::PatIdent {
@@ -90,18 +96,13 @@ impl syn::fold::Fold for MyFold {
     fn fold_pat(&mut self, i: syn::Pat) -> syn::Pat {
         if let syn::Pat::Macro(expr_macro) = i {
             let span = expr_macro.mac.path.span();
-            if let Some(typ @ ("deref" | "owned" | "stamp")) = expr_macro
-                .mac
-                .path
-                .get_ident()
-                .map(ToString::to_string)
-                .as_deref()
-            {
-                match syn::parse2::<PatSingle>(expr_macro.mac.tokens) {
-                    Ok(PatSingle(subpat)) => {
-                        let subpat = syn::fold::fold_pat(self, subpat);
-                        let typ = typ.parse().unwrap();
-                        let pat_ident = self.handle(subpat, typ, span);
+            let macro_name = expr_macro.mac.path.get_ident().map(ToString::to_string);
+
+            if let Some("mb") = macro_name.as_deref() {
+                match syn::parse2::<DerefPattern>(expr_macro.mac.tokens) {
+                    Ok(mut deref_pat) => {
+                        deref_pat.pat = syn::fold::fold_pat(self, deref_pat.pat);
+                        let pat_ident = self.handle(deref_pat, span);
                         syn::Pat::Ident(pat_ident)
                     }
                     Err(err) => {
@@ -121,19 +122,19 @@ impl syn::fold::Fold for MyFold {
 fn tower(binds: &[Bind], yes: syn::Expr, no: &syn::Expr, add_ref: bool) -> syn::Expr {
     let mut out = yes;
     for bind in binds {
-        let &Bind {
-            ref id,
-            ref pat,
-            mut typ,
+        let Bind {
+            id,
+            deref_pat,
             span,
         } = bind;
 
-        if add_ref {
-            typ = typ.add_ref();
-        }
-        let op: proc_macro2::TokenStream = typ.as_op(span);
-
-        out = syn::parse_quote_spanned! {span=>
+        let op = if add_ref {
+            deref_pat.as_guard_op(*span)
+        } else {
+            deref_pat.as_body_op()
+        };
+        let pat = &deref_pat.pat;
+        out = syn::parse_quote_spanned! {*span=>
             if let #pat = #op #id {
                 #out
             } else {
@@ -183,6 +184,6 @@ fn matchbox_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
 /// See [crate].
 #[proc_macro]
 pub fn matchbox(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let a = matchbox_impl(syn::parse_macro_input!(tokens as syn::ExprMatch));
-    quote::quote! { #a }.into()
+    let expr = matchbox_impl(syn::parse_macro_input!(tokens as syn::ExprMatch));
+    quote::quote! { #expr }.into()
 }

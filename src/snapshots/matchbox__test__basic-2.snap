@@ -1,6 +1,6 @@
 ---
 source: src/test.rs
-expression: "snapshot! { match () { deref!((deref!(x),)) => {} } }"
+expression: "snapshot! { match () { mb!(&**(mb!(&**x),)) => {} } }"
 ---
 fn main() {
     match () {
