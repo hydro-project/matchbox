@@ -1,11 +1,13 @@
 ---
 source: src/test.rs
-expression: "snapshot! { match () { deref!(x) => () } }"
+expression: "snapshot! { match () { derefref!(derefref!(x)) => () } }"
 ---
 fn main() {
     match () {
-        a0 if { #[allow(unused_variables)] if let x = &**a0 { true } else { false } } => {
-            if let x = &**a0 {
+        a0 if {
+            #[allow(unused_variables)] if let derefref!(x) = &**a0 { true } else { false }
+        } => {
+            if let derefref!(x) = &**a0 {
                 ()
             } else {
                 panic!(

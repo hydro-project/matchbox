@@ -1,6 +1,6 @@
 ---
 source: src/test.rs
-expression: "snapshot! { match &Rc::new(Nil) { deref!(_) => a0, _ => panic!() } }"
+expression: "snapshot! { match &Rc::new(Nil) { derefref!(_) => a0, _ => panic!() } }"
 ---
 fn main() {
     match &Rc::new(Nil) {

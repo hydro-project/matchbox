@@ -19,22 +19,25 @@ impl syn::parse::Parse for PatSingle {
 #[repr(u8)]
 enum Type {
     Owned,
-    Stamp,
     Deref,
+    DerefRef,
+    MutDeref,
+    MutDerefRef,
 }
 impl Type {
     fn add_ref(self) -> Self {
         match self {
-            Self::Owned => Self::Stamp,
-            Self::Stamp => Self::Deref,
-            Self::Deref => Self::Deref,
+            Self::Owned => Self::Deref,
+            _ => Self::DerefRef,
         }
     }
     fn as_op(self, span: proc_macro2::Span) -> proc_macro2::TokenStream {
         match self {
             Self::Owned => quote::quote_spanned! {span=> * },
-            Self::Stamp => quote::quote_spanned! {span=> &* },
-            Self::Deref => quote::quote_spanned! {span=> &** },
+            Self::Deref => quote::quote_spanned! {span=> &* },
+            Self::DerefRef => quote::quote_spanned! {span=> &** },
+            Self::MutDeref => quote::quote_spanned! {span=> &mut * },
+            Self::MutDerefRef => quote::quote_spanned! {span=> &mut ** },
         }
     }
 }
@@ -44,8 +47,10 @@ impl FromStr for Type {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "owned" => Ok(Self::Owned),
-            "stamp" => Ok(Self::Stamp),
             "deref" => Ok(Self::Deref),
+            "derefref" => Ok(Self::DerefRef),
+            "mutderef" => Ok(Self::MutDeref),
+            "mutderefref" => Ok(Self::MutDerefRef),
             other => Err(other.to_owned()),
         }
     }
@@ -90,7 +95,7 @@ impl syn::fold::Fold for MyFold {
     fn fold_pat(&mut self, i: syn::Pat) -> syn::Pat {
         if let syn::Pat::Macro(expr_macro) = i {
             let span = expr_macro.mac.path.span();
-            if let Some(typ @ ("deref" | "owned" | "stamp")) = expr_macro
+            if let Some(typ @ ("owned" | "deref" | "derefref" | "mutderef" | "mutderefref")) = expr_macro
                 .mac
                 .path
                 .get_ident()
