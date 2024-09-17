@@ -1,0 +1,13 @@
+error: cannot find macro `mob` in this scope
+  --> tests/compile-fail/wrong_macro.rs:14:20
+   |
+14 |             Symbol(mob!(* s)) => {},
+   |                    ^^^
+
+warning: unreachable pattern
+  --> tests/compile-fail/wrong_macro.rs:15:13
+   |
+15 |             _ => panic!(),
+   |             ^
+   |
+   = note: `#[warn(unreachable_patterns)]` on by default

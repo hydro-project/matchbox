@@ -5,6 +5,8 @@ use syn::spanned::Spanned;
 
 mod test;
 
+const INNER_MACRO_NAME: &str = "mb";
+
 struct DerefPattern {
     amp: Option<syn::Token![&]>,
     mutability: Option<syn::Token![mut]>,
@@ -98,10 +100,10 @@ impl syn::fold::Fold for MyFold {
             let span = expr_macro.mac.path.span();
             let macro_name = expr_macro.mac.path.get_ident().map(ToString::to_string);
 
-            if let Some("mb") = macro_name.as_deref() {
+            if let Some(INNER_MACRO_NAME) = macro_name.as_deref() {
                 match syn::parse2::<DerefPattern>(expr_macro.mac.tokens) {
                     Ok(mut deref_pat) => {
-                        deref_pat.pat = syn::fold::fold_pat(self, deref_pat.pat);
+                        deref_pat.pat = self.fold_pat(deref_pat.pat);
                         let pat_ident = self.handle(deref_pat, span);
                         syn::Pat::Ident(pat_ident)
                     }

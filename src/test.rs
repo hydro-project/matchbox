@@ -99,8 +99,9 @@ fn test_other() {
     };
 
     snapshot_test! {
-        match () {
-            mb!(&**mb!(&**x)) => ()
+        match Box::new(Box::new(5)) {
+            mb!(&**mb!(&**x)) => x,
+            _ => panic!()
         }
     };
     snapshot_test! {

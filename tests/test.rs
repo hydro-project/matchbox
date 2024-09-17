@@ -93,6 +93,12 @@ fn test_ref() {
         },
         5
     );
+    matchbox::matchbox! {
+        match &Box::new(Box::new(5)) {
+            mb!(&** mb!(&** 5)) => {},
+            _ => panic!()
+        }
+    };
 }
 
 #[test]
@@ -260,4 +266,10 @@ fn test_own() {
         },
         5
     );
+}
+
+#[test]
+fn test_compile_fail() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/compile-fail/*.rs");
 }

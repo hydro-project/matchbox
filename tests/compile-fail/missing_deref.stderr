@@ -1,0 +1,13 @@
+error: expected `*`
+  --> tests/compile-fail/missing_deref.rs:14:24
+   |
+14 |             Symbol(mb!(s)) => {},
+   |                        ^
+
+warning: unreachable pattern
+  --> tests/compile-fail/missing_deref.rs:15:13
+   |
+15 |             _ => panic!(),
+   |             ^
+   |
+   = note: `#[warn(unreachable_patterns)]` on by default

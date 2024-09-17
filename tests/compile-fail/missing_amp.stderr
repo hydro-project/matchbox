@@ -1,0 +1,13 @@
+error: expected one of: identifier, `::`, `<`, `_`, literal, `const`, `ref`, `mut`, `&`, parentheses, square brackets, `..`, `const`
+  --> tests/compile-fail/missing_amp.rs:14:25
+   |
+14 |             Symbol(mb!(** s)) => {},
+   |                         ^
+
+warning: unreachable pattern
+  --> tests/compile-fail/missing_amp.rs:15:13
+   |
+15 |             _ => panic!(),
+   |             ^
+   |
+   = note: `#[warn(unreachable_patterns)]` on by default

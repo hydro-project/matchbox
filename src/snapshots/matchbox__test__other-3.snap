@@ -1,20 +1,27 @@
 ---
 source: src/test.rs
-expression: "snapshot! { match () { mb!(&**mb!(&**x)) => () } }"
+expression: "snapshot!\n{ match Box::new(Box::new(5)) { mb!(&**mb!(&**x)) => x, _ => panic!() } }"
 ---
 fn main() {
-    match () {
-        a0 if {
+    match Box::new(Box::new(5)) {
+        a1 if {
             #[allow(unused_variables)]
-            if let mb!(& * * x) = &**a0 { true } else { false }
+            if let a0 = &**a1 { if let x = &**a0 { true } else { false } } else { false }
         } => {
-            if let mb!(& * * x) = &**a0 {
-                ()
+            if let a0 = &**a1 {
+                if let x = &**a0 {
+                    x
+                } else {
+                    panic!(
+                        "Two invocations of Deref::deref returned different outputs on same inputs",
+                    )
+                }
             } else {
                 panic!(
                     "Two invocations of Deref::deref returned different outputs on same inputs",
                 )
             }
         }
+        _ => panic!(),
     }
 }
