@@ -4,7 +4,14 @@ expression: "snapshot! { match () { mb!(&**x) => () } }"
 ---
 fn main() {
     match () {
-        a0 if { #[allow(unused_variables)] if let x = &**a0 { true } else { false } } => {
+        a0 if {
+            #[allow(unused_variables)]
+            {
+                #[allow(clippy::match_like_matches_macro)]
+                if let x = &**a0 { true } else { false }
+            }
+        } => {
+            #[allow(clippy::match_like_matches_macro)]
             if let x = &**a0 {
                 ()
             } else {

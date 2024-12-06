@@ -5,8 +5,13 @@ expression: "snapshot! { match () { a @ mb!(&**b @ ()) => {}, _ => panic!(), } }
 fn main() {
     match () {
         a @ a0 if {
-            #[allow(unused_variables)] if let b @ () = &**a0 { true } else { false }
+            #[allow(unused_variables)]
+            {
+                #[allow(clippy::match_like_matches_macro)]
+                if let b @ () = &**a0 { true } else { false }
+            }
         } => {
+            #[allow(clippy::match_like_matches_macro)]
             if let b @ () = &**a0 {
                 {}
             } else {

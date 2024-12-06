@@ -4,11 +4,18 @@ expression: "snapshot! { match &Rc::new(Nil) { mb!(&**_) => a0, _ => panic!() } 
 ---
 fn main() {
     match &Rc::new(Nil) {
-        a0 if { #[allow(unused_variables)] if let _ = &**a0 { true } else { false } } => {
+        a0 if {
+            #[allow(unused_variables)]
+            {
+                #[allow(clippy::match_like_matches_macro)]
+                if let _ = &**a0 { true } else { false }
+            }
+        } => {
+            #[allow(clippy::match_like_matches_macro)]
             if let _ = &**a0 {
                 a0
             } else {
-                panic!(
+                ::core::panic!(
                     "Two invocations of Deref::deref returned different outputs on same inputs",
                 )
             }

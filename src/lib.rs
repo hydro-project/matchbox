@@ -137,10 +137,13 @@ fn tower(binds: &[Bind], yes: syn::Expr, no: &syn::Expr, add_ref: bool) -> syn::
         };
         let pat = &deref_pat.pat;
         out = syn::parse_quote_spanned! {*span=>
-            if let #pat = #op #id {
-                #out
-            } else {
-                #no
+            {
+                #[allow(clippy::match_like_matches_macro)]
+                if let #pat = #op #id {
+                    #out
+                } else {
+                    #no
+                }
             }
         };
     }

@@ -6,42 +6,64 @@ fn main() {
     match () {
         a3 if {
             #[allow(unused_variables)]
-            if let (a1, a2) = &**a3 {
-                if let y = &**a2 {
-                    if let (a0,) = &**a1 {
-                        if let x = &**a0 { true } else { false }
-                    } else {
-                        false
+            {
+                #[allow(clippy::match_like_matches_macro)]
+                if let (a1, a2) = &**a3 {
+                    {
+                        #[allow(clippy::match_like_matches_macro)]
+                        if let y = &**a2 {
+                            {
+                                #[allow(clippy::match_like_matches_macro)]
+                                if let (a0,) = &**a1 {
+                                    {
+                                        #[allow(clippy::match_like_matches_macro)]
+                                        if let x = &**a0 { true } else { false }
+                                    }
+                                } else {
+                                    false
+                                }
+                            }
+                        } else {
+                            false
+                        }
                     }
                 } else {
                     false
                 }
-            } else {
-                false
             }
         } => {
+            #[allow(clippy::match_like_matches_macro)]
             if let (a1, a2) = &**a3 {
-                if let y = &**a2 {
-                    if let (a0,) = &**a1 {
-                        if let x = &**a0 {
-                            {}
-                        } else {
-                            panic!(
-                                "Two invocations of Deref::deref returned different outputs on same inputs",
-                            )
+                {
+                    #[allow(clippy::match_like_matches_macro)]
+                    if let y = &**a2 {
+                        {
+                            #[allow(clippy::match_like_matches_macro)]
+                            if let (a0,) = &**a1 {
+                                {
+                                    #[allow(clippy::match_like_matches_macro)]
+                                    if let x = &**a0 {
+                                        {}
+                                    } else {
+                                        ::core::panic!(
+                                            "Two invocations of Deref::deref returned different outputs on same inputs",
+                                        )
+                                    }
+                                }
+                            } else {
+                                ::core::panic!(
+                                    "Two invocations of Deref::deref returned different outputs on same inputs",
+                                )
+                            }
                         }
                     } else {
-                        panic!(
+                        ::core::panic!(
                             "Two invocations of Deref::deref returned different outputs on same inputs",
                         )
                     }
-                } else {
-                    panic!(
-                        "Two invocations of Deref::deref returned different outputs on same inputs",
-                    )
                 }
             } else {
-                panic!(
+                ::core::panic!(
                     "Two invocations of Deref::deref returned different outputs on same inputs",
                 )
             }

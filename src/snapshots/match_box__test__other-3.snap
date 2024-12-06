@@ -6,18 +6,32 @@ fn main() {
     match Box::new(Box::new(5)) {
         a1 if {
             #[allow(unused_variables)]
-            if let a0 = &**a1 { if let x = &**a0 { true } else { false } } else { false }
-        } => {
-            if let a0 = &**a1 {
-                if let x = &**a0 {
-                    x
+            {
+                #[allow(clippy::match_like_matches_macro)]
+                if let a0 = &**a1 {
+                    {
+                        #[allow(clippy::match_like_matches_macro)]
+                        if let x = &**a0 { true } else { false }
+                    }
                 } else {
-                    panic!(
-                        "Two invocations of Deref::deref returned different outputs on same inputs",
-                    )
+                    false
+                }
+            }
+        } => {
+            #[allow(clippy::match_like_matches_macro)]
+            if let a0 = &**a1 {
+                {
+                    #[allow(clippy::match_like_matches_macro)]
+                    if let x = &**a0 {
+                        x
+                    } else {
+                        ::core::panic!(
+                            "Two invocations of Deref::deref returned different outputs on same inputs",
+                        )
+                    }
                 }
             } else {
-                panic!(
+                ::core::panic!(
                     "Two invocations of Deref::deref returned different outputs on same inputs",
                 )
             }
