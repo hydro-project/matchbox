@@ -10,7 +10,7 @@ use LispValue::*;
 
 #[test]
 fn test_ref() {
-    let _: i32 = matchbox::matchbox! {
+    let _: i32 = match_box::match_box! {
         match &Nil {
             Nil => 0,
             Cons(mb!(&** _), mb!(&** Nil)) => 0,
@@ -20,7 +20,7 @@ fn test_ref() {
         }
     };
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(&** Symbol(mb!(&** "a"))), _) => 1,
                 _ => 0
@@ -29,7 +29,7 @@ fn test_ref() {
         1
     );
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(&** Symbol(mb!(&** "b"))), _) => 1,
                 _ => 0
@@ -38,7 +38,7 @@ fn test_ref() {
         0
     );
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(&** Symbol(mb!(&** "a"))), mb!(&** x)) => x,
                 _ => panic!()
@@ -48,7 +48,7 @@ fn test_ref() {
     );
     assert_eq!(
         (|| {
-            let _: i32 = matchbox::matchbox! {
+            let _: i32 = match_box::match_box! {
                 match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                     Cons(mb!(&** Symbol(mb!(&** "a"))), mb!(&** x)) => return x.clone(),
                     _ => 0
@@ -61,7 +61,7 @@ fn test_ref() {
     {
         let a0 = 0;
         assert_eq!(
-            matchbox::matchbox! {
+            match_box::match_box! {
                 match &Box::new(Nil) {
                     mb!(&** _) => a0,
                     _ => panic!()
@@ -70,7 +70,7 @@ fn test_ref() {
             0
         );
     }
-    matchbox::matchbox! {
+    match_box::match_box! {
         match &Cons(Box::new(Nil), Box::new(Nil)) {
             Cons(a @ mb!(&** b @ Nil), _) => {
                 assert_eq!(a, &Box::new(Nil));
@@ -80,9 +80,9 @@ fn test_ref() {
         }
     }
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match &Cons(Box::new(Cons(Box::new(Nil), Box::new(Nil))), Box::new(Nil)) {
-                Cons(mb!(&** a), _) => matchbox::matchbox! {
+                Cons(mb!(&** a), _) => match_box::match_box! {
                     match a {
                         Cons(mb!(&** Nil), _) => 5,
                         _ => panic!(),
@@ -93,7 +93,7 @@ fn test_ref() {
         },
         5
     );
-    matchbox::matchbox! {
+    match_box::match_box! {
         match &Box::new(Box::new(5)) {
             mb!(&** mb!(&** 5)) => {},
             _ => panic!()
@@ -103,7 +103,7 @@ fn test_ref() {
 
 #[test]
 fn test_mut() {
-    let _: i32 = matchbox::matchbox! {
+    let _: i32 = match_box::match_box! {
         match &mut Nil {
             Nil => 0,
             Cons(mb!(&mut ** _), mb!(&mut ** x @ Nil)) => {
@@ -116,7 +116,7 @@ fn test_mut() {
         }
     };
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match &mut Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(&mut ** Symbol(mb!(&** "a"))), _) => 1,
                 _ => 0
@@ -125,7 +125,7 @@ fn test_mut() {
         1
     );
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match &mut Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(&mut ** Symbol(mb!(&** "b"))), _) => 1,
                 _ => 0
@@ -134,7 +134,7 @@ fn test_mut() {
         0
     );
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match &mut Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(&mut ** Symbol(mb!(&** "a"))), mb!(&mut ** x)) => x,
                 _ => panic!()
@@ -144,7 +144,7 @@ fn test_mut() {
     );
     assert_eq!(
         (|| {
-            let _: i32 = matchbox::matchbox! {
+            let _: i32 = match_box::match_box! {
                 match &Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                     Cons(mb!(&** Symbol(mb!(&** "a"))), mb!(&** x)) => return x.clone(),
                     _ => 0
@@ -157,7 +157,7 @@ fn test_mut() {
     {
         let a0 = 0;
         assert_eq!(
-            matchbox::matchbox! {
+            match_box::match_box! {
                 match &mut Box::new(Nil) {
                     mb!(&mut ** _) => a0,
                     _ => panic!()
@@ -166,7 +166,7 @@ fn test_mut() {
             0
         );
     }
-    matchbox::matchbox! {
+    match_box::match_box! {
         match &mut Cons(Box::new(Nil), Box::new(Nil)) {
             Cons(mb!(&mut** b @ Nil), _) => {
                 assert_eq!(b, &mut Nil);
@@ -175,9 +175,9 @@ fn test_mut() {
         }
     }
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match &mut Cons(Box::new(Cons(Box::new(Nil), Box::new(Nil))), Box::new(Nil)) {
-                Cons(mb!(&mut ** a), _) => matchbox::matchbox! {
+                Cons(mb!(&mut ** a), _) => match_box::match_box! {
                     match a {
                         Cons(mb!(&mut ** Nil), _) => 5,
                         _ => panic!(),
@@ -192,7 +192,7 @@ fn test_mut() {
 
 #[test]
 fn test_own() {
-    let _: i32 = matchbox::matchbox! {
+    let _: i32 = match_box::match_box! {
         match Nil {
             Nil => 0,
             Cons(mb!(* _), mb!(* Nil)) => 0,
@@ -202,7 +202,7 @@ fn test_own() {
         }
     };
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(* Symbol(mb!(&* "a"))), _) => 1,
                 _ => 0
@@ -211,7 +211,7 @@ fn test_own() {
         1
     );
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(* Symbol(mb!(&* "b"))), _) => 1,
                 _ => 0
@@ -220,7 +220,7 @@ fn test_own() {
         0
     );
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                 Cons(mb!(* Symbol(mb!(&* "a"))), mb!(* x)) => x,
                 _ => panic!()
@@ -230,7 +230,7 @@ fn test_own() {
     );
     assert_eq!(
         (|| {
-            let _: i32 = matchbox::matchbox! {
+            let _: i32 = match_box::match_box! {
                 match Cons(Box::new(Symbol("a".to_owned())), Box::new(Nil)) {
                     Cons(mb!(* Symbol(mb!(&* "a"))), mb!(* x)) => return x.clone(),
                     _ => 0
@@ -243,7 +243,7 @@ fn test_own() {
     {
         let a0 = 0;
         assert_eq!(
-            matchbox::matchbox! {
+            match_box::match_box! {
                 match Box::new(Nil) {
                     mb!(* _) => a0,
                     _ => panic!(),
@@ -253,9 +253,9 @@ fn test_own() {
         );
     }
     assert_eq!(
-        matchbox::matchbox! {
+        match_box::match_box! {
             match Cons(Box::new(Cons(Box::new(Nil), Box::new(Nil))), Box::new(Nil)) {
-                Cons(mb!(* a), _) => matchbox::matchbox! {
+                Cons(mb!(* a), _) => match_box::match_box! {
                     match a {
                         Cons(mb!(* Nil), _) => 5,
                         _ => panic!(),

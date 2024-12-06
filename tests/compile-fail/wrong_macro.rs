@@ -7,7 +7,7 @@ enum LispValue {
 use LispValue::*;
 
 fn main() {
-    matchbox::matchbox! {
+    match_box::match_box! {
         match LispValue::Nil {
             Nil => {},
             Cons(_, _) => {},

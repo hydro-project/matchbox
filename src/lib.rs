@@ -147,7 +147,7 @@ fn tower(binds: &[Bind], yes: syn::Expr, no: &syn::Expr, add_ref: bool) -> syn::
     out
 }
 
-fn matchbox_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
+fn match_box_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
     let mut new_arms = vec![];
     for mut arm in m.arms {
         use syn::fold::Fold;
@@ -185,7 +185,7 @@ fn matchbox_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
 
 /// See [crate].
 #[proc_macro]
-pub fn matchbox(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let expr = matchbox_impl(syn::parse_macro_input!(tokens as syn::ExprMatch));
+pub fn match_box(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let expr = match_box_impl(syn::parse_macro_input!(tokens as syn::ExprMatch));
     quote::quote! { #expr }.into()
 }

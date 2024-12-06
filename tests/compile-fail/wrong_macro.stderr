@@ -8,6 +8,17 @@ warning: unreachable pattern
   --> tests/compile-fail/wrong_macro.rs:15:13
    |
 15 |             _ => panic!(),
-   |             ^
+   |             ^ no value can reach this
    |
+note: multiple earlier patterns match some of the same values
+  --> tests/compile-fail/wrong_macro.rs:15:13
+   |
+12 |             Nil => {},
+   |             --- matches some of the same values
+13 |             Cons(_, _) => {},
+   |             ---------- matches some of the same values
+14 |             Symbol(mob!(* s)) => {},
+   |             ----------------- matches some of the same values
+15 |             _ => panic!(),
+   |             ^ collectively making this unreachable
    = note: `#[warn(unreachable_patterns)]` on by default

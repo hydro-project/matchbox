@@ -3,7 +3,7 @@
 macro_rules! snapshot {
     ( $( $x:tt )* ) => {
         {
-            let match_expr = crate::matchbox_impl(::syn::parse_quote! {
+            let match_expr = crate::match_box_impl(::syn::parse_quote! {
                 $( $x )*
             });
             ::prettyplease::unparse(&::syn::parse_quote! {
@@ -86,7 +86,7 @@ fn test_spelling() {
 
 #[test]
 fn test_other() {
-    // matchbox! doesn't insert unneded guard "if true"
+    // match_box! doesn't insert unneded guard "if true"
     snapshot_test! {
         match () {
             mb!(&**x) => ()
