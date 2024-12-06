@@ -173,7 +173,7 @@ fn match_box_impl(mut m: syn::ExprMatch) -> syn::ExprMatch {
             *arm.body = tower(
                 &my_fold.binds,
                 *arm.body,
-                &syn::parse_quote_spanned! {span=> panic!("Two invocations of Deref::deref returned different outputs on same inputs") },
+                &syn::parse_quote_spanned! {span=> ::core::panic!("Two invocations of Deref::deref returned different outputs on same inputs") },
                 false,
             );
         }

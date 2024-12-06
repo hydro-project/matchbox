@@ -16,12 +16,12 @@ fn main() {
                 if let x = &**a0 {
                     {}
                 } else {
-                    panic!(
+                    ::core::panic!(
                         "Two invocations of Deref::deref returned different outputs on same inputs",
                     )
                 }
             } else {
-                panic!(
+                ::core::panic!(
                     "Two invocations of Deref::deref returned different outputs on same inputs",
                 )
             }
